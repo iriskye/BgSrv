@@ -1,0 +1,39 @@
+04-15 14:21:17.041  29742-29785/? E/AudFlgTr﹕ RecordHandle::stop() get htc.audio.txpid property is 0 different with caller 11298 or mediaserver
+04-15 14:21:17.041  11298-11907/app.jroidk.com.videorecorder V/jroidk/RecordService﹕ audioRecord released
+04-15 14:21:17.041  11298-11906/app.jroidk.com.videorecorder D/jroidk/RecordService﹕ set RecordingStatus from true to false
+04-15 14:21:17.041  11298-11906/app.jroidk.com.videorecorder V/jroidk/RecordService﹕ Finishing recording, calling stop and release on recorder
+04-15 14:21:17.041  11298-11298/app.jroidk.com.videorecorder A/libc﹕ Fatal signal 11 (SIGSEGV) at 0x001577f0 (code=1), thread 11298 (m.videorecorder)
+04-15 14:21:17.041     744-1250/? D/PMS﹕ releaseWL(42f0eba0): PARTIAL_WAKE_LOCK  AudioIn 0x1
+
+1.camera.reconnect() --> after finish recording NO NEED to call reconnect()
+Reconnects to the camera service after another process used it. After unlock() is called, another process may use the camera;
+when the process is done, you must reconnect to the camera, which will re-acquire the lock and allow you to continue using the camera.
+Since API level 14, camera is automatically locked for applications in start(). Applications can use the camera (ex: zoom) after recording starts. There is no need to call this after recording starts or stops.
+
+04-07 14:15:42.142  22481-22481/app.jroidk.com.videorecorder E/AndroidRuntime﹕ FATAL EXCEPTION: main
+    Process: app.jroidk.com.videorecorder, PID: 22481
+    java.nio.BufferOverflowException
+            at java.nio.Buffer.checkPutBounds(Buffer.java:189)
+            at java.nio.DirectByteBuffer.put(DirectByteBuffer.java:307)
+            at java.nio.ByteBuffer.put(ByteBuffer.java:693)
+            at app.jroidk.com.videorecorder.CameraView.onPreviewFrame(CameraView.java:84)
+            at android.hardware.Camera$EventHandler.handleMessage(Camera.java:1267)
+            at android.os.Handler.dispatchMessage(Handler.java:102)
+            at android.os.Looper.loop(Looper.java:157)
+            at android.app.ActivityThread.main(ActivityThread.java:5867)
+            at java.lang.reflect.Method.invokeNative(Native Method)
+            at java.lang.reflect.Method.invoke(Method.java:515)
+            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:858)
+            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:674)
+            at dalvik.system.NativeStart.main(Native Method)
+===========
+1.when stop recording the imageIndex is not synced and hence zero --> lastindex= -1 ==> timestamp[lastIndex] = out of bound
+--> it's bcs onPRevewFrrame aren't called after recorder start==> fixed by running heavy op in another ghread(recorder init thread)
+--> http://stackoverflow.com/questions/7042377/camera-onpreviewframe-not-called
+1. preview is working--> wrong dimension
+------------------------
+V 2.Work on CameraView
+================
+1. AIDL -- check if bindService can keep the activity alive
+2. check public static final int BIND_AUTO_CREATE which will create service before it's started
+

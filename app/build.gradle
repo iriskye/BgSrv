@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "app.jroidk.com.videorecorder"
+        minSdkVersion 16
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'org.bytedeco:javacv:0.11'
+    compile 'org.bytedeco:javacpp:0.11'
+    compile 'org.bytedeco.javacpp-presets:opencv:2.4.11-0.11'
+    compile 'org.bytedeco.javacpp-presets:ffmpeg:2.6.1-0.11'
+}
+
